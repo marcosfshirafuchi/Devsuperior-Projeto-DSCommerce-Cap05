@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.http.MediaType;
@@ -22,6 +23,8 @@ public class ProductControllerIT {
 
     @Autowired
     private MockMvc mockMvc;
+
+    private String adminToken;
 
     private String productName;
 
@@ -80,5 +83,20 @@ public class ProductControllerIT {
         result.andExpect(jsonPath("$.content[0].price").value(90.5));
         //Resultado da url da imagem
         result.andExpect(jsonPath("$.content[0].imgUrl").value("https://raw.githubusercontent.com/devsuperior/dscatalog-resources/master/backend/img/1-big.jpg"));
+    }
+
+
+    @Test
+    public void insertShouldReturnProductDTOCreatedWhenAdminLogged() throws Exception {
+        String jsonBody = "";
+        ResultActions result =mockMvc
+                //No perform vai testar o metódo get do controller e sua url
+                .perform(post("/products")
+                //Vai passar o Bearer Token
+                .header("Authorization", "Bearer " + adminToken)
+                //Vai passar o corpo da requisição
+                .content(jsonBody)
+                //O Tipo da response do método
+                .accept(MediaType.APPLICATION_JSON));
     }
 }

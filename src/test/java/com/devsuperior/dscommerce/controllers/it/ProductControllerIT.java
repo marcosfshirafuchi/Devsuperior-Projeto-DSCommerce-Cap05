@@ -120,6 +120,14 @@ public class ProductControllerIT {
     /*Problema 2: Inserir produto
 
     Implemente os testes de API usando MockMvc para inserção de produto (método POST do ProductController), considerando os seguintes cenários. Lembre-se de inserir o token no cabeçalho da requisição.
+    1.	Inserção de produto insere produto com dados válidos quando logado como admin
+    2.	Inserção de produto retorna 422 e mensagens customizadas com dados inválidos quando logado como admin e campo name for inválido
+    3.	Inserção de produto retorna 422 e mensagens customizadas com dados inválidos quando logado como admin e campo description for inválido
+    4.	Inserção de produto retorna 422 e mensagens customizadas com dados inválidos quando logado como admin e campo price for negativo
+    5.	Inserção de produto retorna 422 e mensagens customizadas com dados inválidos quando logado como admin e campo price for zero
+    6.	Inserção de produto retorna 422 e mensagens customizadas com dados inválidos quando logado como admin e não tiver categoria associada
+    7.	Inserção de produto retorna 403 quando logado como cliente
+    8.	Inserção de produto retorna 401 quando não logado como admin ou cliente
 
     * */
 
@@ -154,5 +162,115 @@ public class ProductControllerIT {
         result.andExpect(jsonPath("$.imgUrl").value("https://raw.githubusercontent.com/devsuperior/dscatalog-resources/master/backend/img/1-big.jpg"));
         //Verifica o categories
         result.andExpect(jsonPath("$.categories[0].id").value(2L));
+    }
+
+    //2.	Inserção de produto retorna 422 e mensagens customizadas com dados inválidos quando logado como admin e campo name for inválido
+    @Test
+    public void insertShouldReturnUnprocessableEntityCreatedWhenAdminLoggedAndInvalidName() throws Exception {
+        product.setName("ab");
+        productDTO = new ProductDTO(product);
+        String jsonBody = objectMapper.writeValueAsString(productDTO);
+        ResultActions result =mockMvc
+                //No perform vai testar o metódo get do controller e sua url
+                .perform(post("/products")
+                        //Vai passar o Bearer Token
+                        .header("Authorization", "Bearer " + adminToken)
+                        //Vai passar o corpo da requisição
+                        .content(jsonBody)
+                        //Fala que o formato da requisição é Json
+                        .contentType(MediaType.APPLICATION_JSON)
+                        //O Tipo da response do método
+                        .accept(MediaType.APPLICATION_JSON));
+
+        //Verificar o status
+        result.andExpect(status().isUnprocessableEntity());
+    }
+
+    //3.	Inserção de produto retorna 422 e mensagens customizadas com dados inválidos quando logado como admin e campo description for inválido
+    @Test
+    public void insertShouldReturnUnprocessableEntityCreatedWhenAdminLoggedAndInvalidDescription() throws Exception {
+        product.setDescription("ab");
+        productDTO = new ProductDTO(product);
+        String jsonBody = objectMapper.writeValueAsString(productDTO);
+        ResultActions result =mockMvc
+                //No perform vai testar o metódo get do controller e sua url
+                .perform(post("/products")
+                        //Vai passar o Bearer Token
+                        .header("Authorization", "Bearer " + adminToken)
+                        //Vai passar o corpo da requisição
+                        .content(jsonBody)
+                        //Fala que o formato da requisição é Json
+                        .contentType(MediaType.APPLICATION_JSON)
+                        //O Tipo da response do método
+                        .accept(MediaType.APPLICATION_JSON));
+
+        //Verificar o status
+        result.andExpect(status().isUnprocessableEntity());
+    }
+
+    //4.	Inserção de produto retorna 422 e mensagens customizadas com dados inválidos quando logado como admin e campo price for negativo
+    @Test
+    public void insertShouldReturnUnprocessableEntityCreatedWhenAdminLoggedAndPriceIsNegative() throws Exception {
+        product.setPrice(-50.0);
+        productDTO = new ProductDTO(product);
+        String jsonBody = objectMapper.writeValueAsString(productDTO);
+        ResultActions result =mockMvc
+                //No perform vai testar o metódo get do controller e sua url
+                .perform(post("/products")
+                        //Vai passar o Bearer Token
+                        .header("Authorization", "Bearer " + adminToken)
+                        //Vai passar o corpo da requisição
+                        .content(jsonBody)
+                        //Fala que o formato da requisição é Json
+                        .contentType(MediaType.APPLICATION_JSON)
+                        //O Tipo da response do método
+                        .accept(MediaType.APPLICATION_JSON));
+
+        //Verificar o status
+        result.andExpect(status().isUnprocessableEntity());
+    }
+
+    //5.	Inserção de produto retorna 422 e mensagens customizadas com dados inválidos quando logado como admin e campo price for zero
+    @Test
+    public void insertShouldReturnUnprocessableEntityCreatedWhenAdminLoggedAndPriceIsZero() throws Exception {
+        product.setPrice(0.0);
+        productDTO = new ProductDTO(product);
+        String jsonBody = objectMapper.writeValueAsString(productDTO);
+        ResultActions result =mockMvc
+                //No perform vai testar o metódo get do controller e sua url
+                .perform(post("/products")
+                        //Vai passar o Bearer Token
+                        .header("Authorization", "Bearer " + adminToken)
+                        //Vai passar o corpo da requisição
+                        .content(jsonBody)
+                        //Fala que o formato da requisição é Json
+                        .contentType(MediaType.APPLICATION_JSON)
+                        //O Tipo da response do método
+                        .accept(MediaType.APPLICATION_JSON));
+
+        //Verificar o status
+        result.andExpect(status().isUnprocessableEntity());
+    }
+
+    //6.	Inserção de produto retorna 422 e mensagens customizadas com dados inválidos quando logado como admin e não tiver categoria associada
+    @Test
+    public void insertShouldReturnUnprocessableEntityCreatedWhenAdminLoggedAndProductHasNotCategory() throws Exception {
+        product.getCategories().clear();
+        productDTO = new ProductDTO(product);
+        String jsonBody = objectMapper.writeValueAsString(productDTO);
+        ResultActions result =mockMvc
+                //No perform vai testar o metódo get do controller e sua url
+                .perform(post("/products")
+                        //Vai passar o Bearer Token
+                        .header("Authorization", "Bearer " + adminToken)
+                        //Vai passar o corpo da requisição
+                        .content(jsonBody)
+                        //Fala que o formato da requisição é Json
+                        .contentType(MediaType.APPLICATION_JSON)
+                        //O Tipo da response do método
+                        .accept(MediaType.APPLICATION_JSON));
+
+        //Verificar o status
+        result.andExpect(status().isUnprocessableEntity());
     }
 }
